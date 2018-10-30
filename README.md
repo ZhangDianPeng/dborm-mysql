@@ -35,7 +35,7 @@ let textDbFieldsMap = {
     "bigviz_user": ['details']
 }
 
-let dbORM = require('dborm')({
+let dbORM = require('dborm-mysql')({
     dbConfig,      // Database configuration information
     db2ramFieldMap, // defined the table structure map from Ram to Database
     textDbFieldsMap,  // if these is a field in mysql table need to JSON.parse or JSON.stringify, you need to add it.
