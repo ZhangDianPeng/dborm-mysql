@@ -1,0 +1,32 @@
+{
+  "name": "dborm",
+  "version": "1.0.1",
+  "description": "a NodeJs ORM for mysql",
+  "main": "index.js",
+  "dependencies": {
+    "co": "^4.6.0",
+    "lodash": "^4.17.4",
+    "mysql": "^2.14.1",
+    "util": "^0.10.3"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^3.3.0",
+    "should": "~3.3.1"
+  },
+  "scripts": {
+    "test": "istanbul cover node_modules/mocha/bin/_mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@g.hz.netease.com:22222/hzzhangdianpeng/dbORM.git"
+  },
+  "keywords": [
+    "nodejs",
+    "orm",
+    "mysql"
+  ],
+  "author": "zhangdianp@163.com",
+  "license": "ISC"
+}

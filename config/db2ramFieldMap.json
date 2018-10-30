@@ -1,0 +1,53 @@
+{
+  "feedback": {
+    "id": "id",
+    "folder_id": "folderId",
+    "project_id": "projectId",
+    "share_key": "shareKey",
+    "idx": "idx",
+    "title": "title",
+    "setting": "setting",
+    "user_id": "userId",
+    "category": "category",
+    "flush_time": "flushTime",
+    "creator_id": "creatorId",
+    "create_time": "createTime",
+    "modifier_id": "modifierId",
+    "modify_time": "modifyTime"
+  },
+  "bigviz_user": {
+    "id": "id",
+    "subline": "subline",
+    "department": "department",
+    "nick": "nick",
+    "email": "email",
+    "type": "type",
+    "salt": "salt",
+    "password": "password",
+    "last_login_ip": "lastLoginIp",
+    "last_login_time": "lastLoginTime",
+    "version_flag": "versionFlag",
+    "phone": "phone",
+    "channel": "channel",
+    "company": "company",
+    "active": "active",
+    "last_project": "lastProject",
+    "backend": "backend",
+    "pass_by": "passBy",
+    "pay": "pay",
+    "expired_time": "expiredTime",
+    "expired": "expired",
+    "create_time": "createTime",
+    "modify_time": "modifyTime"
+  },
+  "sample": {
+    "id": "id",
+    "project_id": "projectId",
+    "name": "name",
+    "json": "json",
+    "creator_id": "creatorId",
+    "create_time": "createTime",
+    "modifier_id": "modifierId",
+    "modify_time": "modifyTime"
+  }
+}
