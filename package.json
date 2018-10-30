@@ -1,6 +1,6 @@
 {
   "name": "dborm",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "a NodeJs ORM for mysql",
   "main": "index.js",
   "dependencies": {
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@g.hz.netease.com:22222/hzzhangdianpeng/dbORM.git"
+    "url": "https://github.com/ZhangDianPeng/dborm"
   },
   "keywords": [
     "nodejs",
