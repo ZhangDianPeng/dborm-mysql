@@ -111,7 +111,7 @@ userDao.getList({
     }
 });
 
-// get userList where department like "%qa%" and subline is 0
+// get userList where department like "%qa%" and subline is 1
 userDao.getList({
     keyword: 'department:qa',
     subline: 1
@@ -123,7 +123,7 @@ userDao.getList({
     inFields: {
         department: ['qa', 'developer']
     },
-    sort: ['id:1', 'department:2']
+    sort: ['id:2', 'department:1']   // 1 is asc, 2 is desc
 });
 
 // get useList with selected fields where department in ['qa', 'developer']
