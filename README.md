@@ -259,7 +259,7 @@ db.query('select * from bigviz_user where id = ?', [3]);
 
 Wrap fn for Transaction processing. The nth is the position of 'conn' in fn parameter list.
 
-If these is a Error in fn, it will rollback all sql-querys with conn. Each sql-query must hava a "conn" param.
+If these is a Error in fn, it will rollback all sql-querys with conn. Each sql-query must have a "conn" param.
 
 ```javascript
 db.wrapTransaction(async function(addUsers, deleteUserIds, conn){
