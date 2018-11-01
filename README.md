@@ -2,7 +2,7 @@
 
 - DbOrm is a NodeJs ORM for mysql.
 - All function return a promise.
-- Every table should has a primary key named id.
+- Each table should have a primary key named id.
 
 #### Start
 
