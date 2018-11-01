@@ -259,13 +259,13 @@ db.query('select * from bigviz_user where id = ?', [3]);
 
 Wrap fn for Transaction processing. The nth is the position of 'conn' in fn parameter list.
 
-If these is a Error in fn, it will rollback all sql querying with conn. 
+If these is a Error in fn, it will rollback all sql-querys with conn. Each sql-query must hava a "conn" param.
 
 ```javascript
 db.wrapTransaction(async function(addUsers, deleteUserIds, conn){
     await userDao.createBulk(addUsers, conn);
     await userDao.deleteByIds(deleteUserIds, conn);
-    await db.query('select * from bigviz_user where id = ?', [3]);
+    await db.query('select * from bigviz_user where id = ?', [3], conn);
 }, 2);
 ```
 
