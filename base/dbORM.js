@@ -57,6 +57,10 @@ let dbFunss = (config) => {
         return await db.query(sql, params, connection).then(res => dbUtil.convert2RamFieldName(tableName, res));
     };
 
+    exportsObj.findOne = async function (tableName, query, connection) {
+        return await exportsObj.getList(tableName, query, connection).then(res => res && res[0]);
+    };
+
     exportsObj.getListByIds = async function (tableName, ids, connection) {
         if(!ids || !ids.length){
             return [];

@@ -261,6 +261,19 @@ describe('sampleDao', function(){
     });
 
     //getListByIds接口
+    describe('findOne', function(){
+        let query = {
+            selectFields: 'projectId',
+            projectId: 1
+        };
+        it('return One dashboard', function (){
+            return sampleDao.findOne(query).then(res =>{
+                res.should.to.be.an('object');
+            })
+        });
+    });
+
+    //getListByIds接口
     describe('getListByIds', function(){
         it('return dashboards', function (){
             return sampleDao.getListByIds([id0, id1]).then(res =>{
