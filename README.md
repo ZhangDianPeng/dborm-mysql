@@ -148,9 +148,11 @@ userDao.getList({
 ##### update
 
 Update one row from table by id.
+If you want to set some fields to NULL, you need to add the 'nullFields'
 
 ```javascript
 userDao.update({
+    nullFields: ['name'], // set the name field to NULL
     department: 'qa',
     info: {
         a: 1
