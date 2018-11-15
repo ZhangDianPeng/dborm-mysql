@@ -327,6 +327,20 @@ describe('sampleDao', function(){
                 res.should.to.be.instanceOf(Object);
             })
         });
+        it('update with nullFields', function (){
+            let sample = {
+                projectId: 2,
+                nullFields: ['name', 'creatorId'],
+                json: {
+                    a: 1,
+                    b: 2,
+                    c: 3
+                }
+            };
+            return sampleDao.update(sample, id0).then(res =>{
+                res.should.to.be.instanceOf(Object);
+            })
+        });
     });
 
     //updateByIds接口
