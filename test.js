@@ -331,6 +331,8 @@ describe('sampleDao', function(){
             let sample = {
                 projectId: 2,
                 nullFields: ['name', 'creatorId'],
+                name: null,
+                creatorId: undefined,
                 json: {
                     a: 1,
                     b: 2,

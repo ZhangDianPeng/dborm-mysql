@@ -304,19 +304,12 @@ module.exports = (config, {dbCode = 733}) => {
         if (obj) {
             if (!obj.modify_time && fieldNames.includes('modify_time'))
                 obj.modify_time = new Date();
-            fieldNames.concat('nullFields').forEach((fieldName) => {
+            let nullFields = dbUtil.toDbFieldNames(tableName, obj['nullFields'] || []);
+            fieldNames.forEach((fieldName) => {
                 let value = obj[fieldName];
-                if (!util.isNullOrUndefined(value)) {
-                    if(fieldName === 'nullFields' && value.length){
-                        value.forEach(f => {
-                            f = dbUtil.toDbFieldNames(tableName, [f])[0];
-                            params.push(null);
-                            updateArr.push(f + '=?');
-                        })
-                    }else{
-                        params.push(value);
-                        updateArr.push(fieldName + '=?');
-                    }
+                if (nullFields.includes(fieldName) || !util.isNullOrUndefined(value)) {
+                    params.push(value);
+                    updateArr.push(fieldName + '=?');
                 }
             });
         }
