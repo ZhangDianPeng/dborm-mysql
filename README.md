@@ -243,6 +243,28 @@ userDao.createBulk([
 
 ```
 
+##### pageQuery
+
+Query database for paging, you must have an exist sql for quering data. 
+You can add keyword, sort, offset, limit based on the exist sql.
+The function return an object with count and list field.
+
+```javascript
+userDao.pageQuery({
+    initSql: 'select nick, email from bigviz_user where id in (?)',
+    initParams: [[1, 2, 3, 4, 5, 6]],
+    offset: 0,
+    limit: 2,
+    sort: ['age:2'], // sort by the age
+    keyword: {
+        nick: 'xx'   // search by the nick
+    }
+});
+
+// return {count: 4, list: [...]}
+
+```
+
 #### db
 
 Get the db for original Query and Transaction processing.

@@ -133,6 +133,25 @@ describe('sampleDao', function(){
         });
     });
 
+    //pageQuery接口
+    describe('pageQuery', function(){
+        it('分页查询返回 count and list', function (){
+            return sampleDao.pageQuery({
+                initSql: 'select project_id as projectId, name from sample where id = ?',
+                initParams: [1],
+                offset: 0,
+                limit: 20,
+                sort: ['name:2'],
+                keyword: {
+                    name: 'xx'
+                }
+            }).then(res => {
+                expect(res.count).to.be.a('number');
+                expect(res.list).to.be.an('array');
+            })
+        });
+    });
+
     //getList接口
     describe('getList', function(){
         let query = {

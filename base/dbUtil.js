@@ -29,6 +29,32 @@ module.exports = (config, {dbCode = 733}) => {
          return keyword;
     };
 
+    dbUtil.createKeywordSql = function(tableName, keywordRes){
+        let params = [], orSqls = [];
+        if(typeof keywordRes == 'string'){
+            let [field, ...keyword] = keywordRes.split(':');
+            keyword = keyword.join(':');
+            orSqls.push(tableName + '.' + field + ' like ?');
+            if (keyword) {
+                keyword = dbUtil.parseKeyword(keyword);
+            }
+            params.push('%' + keyword + '%');
+        }else{
+            Object.keys(keywordRes).map(field => {
+                let subKeyword = keywordRes[field];
+                orSqls.push(tableName + '.' + field + ' like ?');
+                if (subKeyword) {
+                    subKeyword = dbUtil.parseKeyword(subKeyword);
+                }
+                params.push('%' + subKeyword + '%');
+            });
+        }
+        return {
+            params,
+            sql: `(${orSqls.join(' or ')})`
+        };
+
+    };
     dbUtil.getWhereFields = function(tableName, field, insertFieldNameMap){
         if(insertFieldNameMap[field]){
             return '(' + insertFieldNameMap[field] + ')';
@@ -61,7 +87,7 @@ module.exports = (config, {dbCode = 733}) => {
     let textRamFields = dbUtil.getTextRamFields(textDbFields);
 
     function judgeTable(tableName) {
-        if (!tableNames.includes(tableName)) {
+        if (!tableNames.concat('pageTable').includes(tableName)) {
             throw new Error(`tableName<${tableName}> is not ok`);
         }
     }
@@ -137,7 +163,7 @@ module.exports = (config, {dbCode = 733}) => {
             if (!util.isNullOrUndefined(fieldMap[fieldName]))
                 return fieldMap[fieldName];
             else if (insertFieldNames.includes(fieldName)){
-                return fieldName
+                return fieldName;
             } else {
                 throw new Error(`<${tableName}>中不存在该字段<${fieldName}>`);
             }

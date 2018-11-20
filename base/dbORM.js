@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const dbOrigin = require('./db');
 const dbUtilOrigin = require('./dbUtil');
 
@@ -84,6 +86,46 @@ let dbFunss = (config) => {
         return await db.query(sql, params, connection).then(res => {
             return res[0].count;
         });
+    };
+
+    exportsObj.pageQuery = async function (tableName, query, connection) {
+        let {offset, limit, initSql, initParams = [], keyword, sort} = query;
+        if(_.isNil(limit) || _.isNil(offset)){
+            throw new Error('limit and offset cannot be undefined');
+        }
+        let countSql = `select count(*) as count from (${initSql}) pageTable `, listSql = `select * from (${initSql}) pageTable `;
+        let countParams = [].concat(initParams), listParams = [].concat(initParams);
+
+        if(keyword){
+            let {sql, params} = dbUtil.createKeywordSql('pageTable', keyword);
+            countSql = `${countSql} where ${sql} `;
+            listSql = `${listSql} where ${sql}`;
+            countParams = countParams.concat(params);
+            listParams = listParams.concat(params);
+        }
+        // 排序
+        if (!(sort === undefined
+            || ((typeof sort === 'string') && sort.length <= 1)
+            || (Array.isArray(sort)) && !sort.length
+        )){
+            sort = Array.isArray(sort) ? sort : [sort];
+            let orderBySqls = sort.map(subSort => {
+                let [field, mode] = subSort.split(':');
+                field = dbUtil.toDbFieldNames(tableName, [field], [field])[0];
+                return dbUtil.getOrderBySql(field, mode, 'pageTable', [field]);
+            }).filter(sql => sql.length > 0);
+            if(orderBySqls.length){
+                listSql += ' order by ' + orderBySqls.join(',');
+            }
+        }
+        // 分页
+        if (limit !== undefined && limit > 0) {
+            listSql += ' limit ?,?';
+            listParams = listParams.concat([offset, limit]);
+        }
+        let listP = db.query(listSql, listParams, connection).then(res => dbUtil.convert2RamFieldName(tableName, res));
+        let countP = db.query(countSql, countParams, connection);
+        return await Promise.all([listP, countP]).then(res => ({list: res[0], count: res[1][0].count}));
     };
 
     exportsObj.add = async function (tableName, data, connection) {
