@@ -12,7 +12,7 @@ let dbConfig = {
     "host": "dev.youdata.com",
     "user": "sup_bigviz",
     "port": 3360,
-    "password": "123456",
+    "password": "Sdc2MslOsxw",
     "multipleStatements": true
 };
 
@@ -103,7 +103,7 @@ describe('sampleDao', function(){
     });
 
     //createBulk接口
-    describe('批量插入数据，返回的插入id只有一个', function(){
+    describe('createBulk 批量插入数据，返回的插入id只有一个', function(){
         it('return a object', function (){
             return sampleDao.createBulk([sample, sample]).then(res => {
                 id1 = res.insertId;

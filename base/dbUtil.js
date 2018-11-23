@@ -226,8 +226,8 @@ module.exports = (config, {dbCode = 733}) => {
         });
 
 
-        let sql = 'INSERT INTO ' + tableName + '(' + fieldNames.join(',') + ')' + ' VALUES ?';
-        let params = objs.map(obj => fieldNames.map(fieldName => obj[fieldName]));
+        let sql = 'INSERT INTO ' + tableName + '(' + addFieldNames.join(',') + ')' + ' VALUES ?';
+        let params = objs.map(obj => addFieldNames.map(fieldName => obj[fieldName]));
         return {
             params: [params],
             sql: sql
