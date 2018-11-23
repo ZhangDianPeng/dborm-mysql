@@ -95,10 +95,12 @@ let dbFunss = (config) => {
 
         if(keyword){
             let {sql, params} = dbUtil.createKeywordSql('pageTable', keyword);
-            countSql = `${countSql} where ${sql} `;
-            listSql = `${listSql} where ${sql}`;
-            countParams = countParams.concat(params);
-            listParams = listParams.concat(params);
+            if(params.length){
+                countSql = `${countSql} where ${sql} `;
+                listSql = `${listSql} where ${sql}`;
+                countParams = countParams.concat(params);
+                listParams = listParams.concat(params);
+            }
         }
         // 排序
         if (!(sort === undefined
