@@ -1,6 +1,6 @@
 {
   "name": "dborm-mysql",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "a NodeJs ORM for mysql",
   "main": "index.js",
   "dependencies": {

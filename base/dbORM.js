@@ -90,9 +90,6 @@ let dbFunss = (config) => {
 
     exportsObj.pageQuery = async function (tableName, query, connection) {
         let {offset, limit, initSql, initParams = [], keyword, sort} = query;
-        if(_.isNil(limit) || _.isNil(offset)){
-            throw new Error('limit and offset cannot be undefined');
-        }
         let countSql = `select count(*) as count from (${initSql}) pageTable `, listSql = `select * from (${initSql}) pageTable `;
         let countParams = [].concat(initParams), listParams = [].concat(initParams);
 
@@ -119,7 +116,7 @@ let dbFunss = (config) => {
             }
         }
         // 分页
-        if (limit !== undefined && limit > 0) {
+        if (!_.isNil(limit) && !_.isNil(offset)) {
             listSql += ' limit ?,?';
             listParams = listParams.concat([offset, limit]);
         }

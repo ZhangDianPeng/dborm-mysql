@@ -42,11 +42,11 @@ module.exports = (config, {dbCode = 733}) => {
         }else{
             Object.keys(keywordRes).map(field => {
                 let subKeyword = keywordRes[field];
-                orSqls.push(tableName + '.' + field + ' like ?');
                 if (subKeyword) {
+                    orSqls.push(tableName + '.' + field + ' like ?');
                     subKeyword = dbUtil.parseKeyword(subKeyword);
+                    params.push('%' + subKeyword + '%');
                 }
-                params.push('%' + subKeyword + '%');
             });
         }
         return {
@@ -270,13 +270,13 @@ module.exports = (config, {dbCode = 733}) => {
                     let orSqls = [];
                     Object.keys(keywordRes).map(field => {
                         let subKeyword = keywordRes[field];
-                        field = dbUtil.toDbFieldNames(tableName, [field], insertFieldNames)[0];
-                        let realField = dbUtil.getWhereFields(tableName, field, insertFieldNameMap);
-                        orSqls.push(realField + ' like ?');
                         if (subKeyword) {
+                            field = dbUtil.toDbFieldNames(tableName, [field], insertFieldNames)[0];
+                            let realField = dbUtil.getWhereFields(tableName, field, insertFieldNameMap);
+                            orSqls.push(realField + ' like ?');
                             subKeyword = dbUtil.parseKeyword(subKeyword);
+                            params.push('%' + subKeyword + '%');
                         }
-                        params.push('%' + subKeyword + '%');
                     });
                     whereArr.push('(' + orSqls.join(' or ') + ')');
                 }
