@@ -89,7 +89,7 @@ let dbFunss = (config) => {
     };
 
     exportsObj.pageQuery = async function (tableName, query, connection) {
-        let {offset, limit, initSql, initParams = [], keyword, sort} = query;
+        let {offset, limit, initSql, initParams = [], keyword, sort, returnFields = ['count', 'list']} = query;
         let countSql = `select count(*) as count from (${initSql}) pageTable `, listSql = `select * from (${initSql}) pageTable `;
         let countParams = [].concat(initParams), listParams = [].concat(initParams);
 
@@ -122,9 +122,14 @@ let dbFunss = (config) => {
             listSql += ' limit ?,?';
             listParams = listParams.concat([offset, limit]);
         }
-        let listP = db.query(listSql, listParams, connection).then(res => dbUtil.convert2RamFieldName(tableName, res));
-        let countP = db.query(countSql, countParams, connection);
-        return await Promise.all([listP, countP]).then(res => ({list: res[0], count: res[1][0].count}));
+        let list, count;
+        if(returnFields.includes('list')){
+            list = await db.query(listSql, listParams, connection).then(res => dbUtil.convert2RamFieldName(tableName, res));
+        }
+        if(returnFields.includes('count')){
+            count = await db.query(countSql, countParams, connection).then(res => res[0].count);
+        }
+        return {list, count};
     };
 
     exportsObj.add = async function (tableName, data, connection) {

@@ -150,6 +150,40 @@ describe('sampleDao', function(){
                 expect(res.list).to.be.an('array');
             })
         });
+
+        it('分页查询返回 only count', function (){
+            return sampleDao.pageQuery({
+                initSql: 'select project_id as projectId, name from sample where id = ?',
+                initParams: [1],
+                offset: 0,
+                limit: 20,
+                sort: ['name:2'],
+                returnFields: ['count'],
+                keyword: {
+                    name: 'xx'
+                }
+            }).then(res => {
+                expect(res.count).to.be.a('number');
+                expect(res.list).to.be.an('undefined');
+            })
+        });
+
+        it('分页查询返回 only count', function (){
+            return sampleDao.pageQuery({
+                initSql: 'select project_id as projectId, name from sample where id = ?',
+                initParams: [1],
+                offset: 0,
+                limit: 20,
+                sort: ['name:2'],
+                returnFields: ['list'],
+                keyword: {
+                    name: 'xx'
+                }
+            }).then(res => {
+                expect(res.count).to.be.an('undefined');
+                expect(res.list).to.be.an('array');
+            })
+        });
     });
 
     //getList接口
