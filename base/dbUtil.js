@@ -433,6 +433,19 @@ module.exports = (config, {dbCode = 733}) => {
         };
     };
 
+    dbUtil.convertSort = function (sort, strFields) {
+        let [field, mode] = sort.split(':');
+        let isStr = strFields && strFields.includes(field);
+        let realMode;
+        if (mode === '1' || mode === 'asc') {
+            realMode = isStr ? '1' : '3';
+        } else if (mode === '2' || mode === 'desc') {
+            realMode = isStr ? '2' : '4';
+        }
+        if (!realMode) throw new Error('sort attr error');
+        return [field, realMode].join(':');
+    };
+
     return dbUtil;
 };
 
