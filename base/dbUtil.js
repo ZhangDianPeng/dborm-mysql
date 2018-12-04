@@ -108,7 +108,11 @@ module.exports = (config, {dbCode = 733}) => {
         data.forEach(function (dataRow) {
             for (let field in dataRow) {
                 if (textFields.indexOf(field) != -1 && util.isString(dataRow[field])) {
-                    dataRow[field] = JSON.parse(dataRow[field]);
+                    try{
+                        dataRow[field] = JSON.parse(dataRow[field]);
+                    }catch(err){
+                        throw new Error(`data error in mysql, dataRow:${JSON.stringify(dataRow)}, field:${field}`);
+                    }
                 }
                 if (fieldMap.hasOwnProperty(field)) {
                     dataRow[fieldMap[field]] = dataRow[field];
