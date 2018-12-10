@@ -36,9 +36,10 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
     db.wrapTransaction = function (fn, nth) {
         const Message = '等待事务超时';
         return function () {
+            let ctx = this;
             let params = Array.from(arguments);
             if (params[nth]) {
-                return fn.apply(null, params);
+                return fn.apply(ctx, params);
             } else {
                 return (co.wrap(function* (params) {
                     let conn = yield db.beginTransaction();
@@ -46,7 +47,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                     try {
                         params[nth] = conn;
                         result = yield Promise.race([
-                            fn.apply(null, params),
+                            fn.apply(ctx, params),
                             new Promise((res) => {
                                 setTimeout(() => {
                                     res(Message);
