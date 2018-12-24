@@ -396,6 +396,23 @@ describe('sampleDao', function(){
                 res.should.to.be.instanceOf(Object);
             })
         });
+        it('update with noUpdateTime', function (){
+            let sample = {
+                projectId: 2,
+                nullFields: ['name', 'creatorId'],
+                name: null,
+                noUpdateTime: true,
+                creatorId: undefined,
+                json: {
+                    a: 1,
+                    b: 2,
+                    c: 3
+                }
+            };
+            return sampleDao.update(sample, id0).then(res =>{
+                res.should.to.be.instanceOf(Object);
+            })
+        });
     });
 
     //updateByIds接口

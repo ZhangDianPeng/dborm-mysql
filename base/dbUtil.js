@@ -332,8 +332,9 @@ module.exports = (config, {dbCode = 733}) => {
 
 
         if (obj) {
-            if (!obj.modify_time && fieldNames.includes('modify_time'))
+            if (!obj.noUpdateTime && !obj.modify_time  && fieldNames.includes('modify_time')){
                 obj.modify_time = new Date();
+            }
             let nullFields = dbUtil.toDbFieldNames(tableName, obj['nullFields'] || []);
             fieldNames.forEach((fieldName) => {
                 let value = obj[fieldName];
