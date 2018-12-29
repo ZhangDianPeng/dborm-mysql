@@ -447,6 +447,8 @@ module.exports = (config, {dbCode = 733}) => {
                 realMode = isStr ? '1' : '3';
             } else if (mode === '2' || mode === 'desc') {
                 realMode = isStr ? '2' : '4';
+            }else{
+                realMode = mode;
             }
             if (!realMode) throw new Error('sort attr error');
             return [field, realMode].join(':');
