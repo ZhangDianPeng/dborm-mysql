@@ -18,7 +18,7 @@ let dbFunss = (config) => {
     exportsObj.dbUtil = dbUtil;
 
     exportsObj.getList = async function (tableName, query, connection) {
-        let { selectFields, sort, limit = 0, offset = 0 } = query;
+        let { selectFields, sort, limit = 0, offset = 0, initSessionSql} = query;
         let params = [];
 
         let {sql, insertFieldNames, insertFieldNameMap} = dbUtil.createSelectSql(tableName, selectFields);
@@ -55,8 +55,16 @@ let dbFunss = (config) => {
             sql += ' limit ?,?';
             params.push(offset, limit);
         }
+        if(initSessionSql){
+            sql = initSessionSql + ';' + sql;
+        }
 
-        return await db.query(sql, params, connection).then(res => dbUtil.convert2RamFieldName(tableName, res));
+        return await db.query(sql, params, connection).then(res => {
+            if(initSessionSql){
+                res = res[1];
+            }
+            return dbUtil.convert2RamFieldName(tableName, res);
+        });
     };
 
     exportsObj.findOne = async function (tableName, query, connection) {
@@ -89,7 +97,7 @@ let dbFunss = (config) => {
     };
 
     exportsObj.pageQuery = async function (tableName, query, connection) {
-        let {offset, limit, initSql, initParams = [], keyword, sort, returnFields = ['count', 'list']} = query;
+        let {offset, limit, initSql, initParams = [], keyword, sort, returnFields = ['count', 'list'], initSessionSql} = query;
         let countSql = `select count(*) as count from (${initSql}) pageTable `, listSql = `select * from (${initSql}) pageTable `;
         let countParams = [].concat(initParams), listParams = [].concat(initParams);
 
@@ -122,12 +130,26 @@ let dbFunss = (config) => {
             listSql += ' limit ?,?';
             listParams = listParams.concat([offset, limit]);
         }
+        if(initSessionSql){
+            listSql = initSessionSql + ';' + listSql;
+            countSql = initSessionSql + ';' + countSql;
+        }
         let list, count;
         if(returnFields.includes('list')){
-            list = await db.query(listSql, listParams, connection).then(res => dbUtil.convert2RamFieldName(tableName, res));
+            list = await db.query(listSql, listParams, connection).then(res => {
+                if(initSessionSql){
+                    res = res[1];
+                }
+                return dbUtil.convert2RamFieldName(tableName, res);
+            });
         }
         if(returnFields.includes('count')){
-            count = await db.query(countSql, countParams, connection).then(res => res[0].count);
+            count = await db.query(countSql, countParams, connection).then(res => {
+                if(initSessionSql){
+                    res = res[1];
+                }
+                return res[0].count;
+            });
         }
         return {list, count};
     };

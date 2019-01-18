@@ -144,7 +144,8 @@ describe('sampleDao', function(){
                 sort: ['name:2'],
                 keyword: {
                     name: 'xx'
-                }
+                },
+                initSessionSql: 'select 1'
             }).then(res => {
                 expect(res.count).to.be.a('number');
                 expect(res.list).to.be.an('array');
@@ -193,7 +194,8 @@ describe('sampleDao', function(){
             projectId: 1,
             keyword: {
                 name: 's\amp_l%e'
-            }
+            },
+            initSessionSql: 'select 1'
         };
         it('return dashboards', function (){
             return sampleDao.getList(Object.assign({}, {inFields: {
@@ -351,14 +353,12 @@ describe('sampleDao', function(){
             return sampleDao.getCount(Object.assign({}, {inFields: {
                 id: [id0, id1]
             }})).then(res => {
-                console.log('count:', res);
                 res.should.to.be.a('number');
                 res.should.to.be.least(0);
             })
         });
         it('return all count if query is {}', function(){
             return sampleDao.getCount({}).then(res => {
-                console.log('count:', res);
                 res.should.to.be.a('number');
                 res.should.to.be.least(0);
             })
