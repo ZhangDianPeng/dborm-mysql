@@ -1,8 +1,9 @@
 {
   "name": "dborm-mysql",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "a NodeJs ORM for mysql",
   "main": "index.js",
+  "types": "index.d.ts",
   "dependencies": {
     "co": "^4.6.0",
     "lodash": "^4.17.4",

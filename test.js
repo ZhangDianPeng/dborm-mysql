@@ -16,7 +16,7 @@ let dbConfig = {
     "multipleStatements": true
 };
 
-let dbORM = require('./base/dbORM')({
+let dbORM = require('./index')({
     log: true,
     dbConfig,
     db2ramFieldMap,
