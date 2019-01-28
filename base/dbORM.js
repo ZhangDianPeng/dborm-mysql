@@ -183,7 +183,7 @@ let dbFunss = (config) => {
 
     exportsObj.updateByIds = async function (tableName, data, ids, connection) {
         if(!ids || !ids.length){
-            return await Promise.resolve();
+            return await Promise.resolve('ok');
         }
         let sql = `update ${tableName} set `;
         data = dbUtil.convert2DbFieldName(tableName, data);
@@ -193,11 +193,13 @@ let dbFunss = (config) => {
         params = params.concat(updateSql.params);
         sql += ' where id in (?)';
         params.push(ids);
-        return await db.query(sql, params, connection);
+        await db.query(sql, params, connection);
+        return 'ok';
     };
 
     exportsObj.update = async function (tableName, data, id, connection) {
-        return await exportsObj.updateByIds(tableName, data, [id], connection);
+        await exportsObj.updateByIds(tableName, data, [id], connection);
+        return 'ok';
     };
 
     exportsObj.updateByQuery = async function (tableName, data, query, connection) {
@@ -215,7 +217,8 @@ let dbFunss = (config) => {
         }else{
             return await Promise.reject(new Error('updateByQuery不能无条件update'));
         }
-        return await db.query(sql, params, connection);
+        await db.query(sql, params, connection);
+        return 'ok';
     };
 
     exportsObj.get = async function (tableName, id, connection) {
@@ -233,10 +236,11 @@ let dbFunss = (config) => {
 
     exportsObj.updateBulk = async function (tableName, objs, connection) {
         if (!objs || !objs.length)
-            return await Promise.resolve({});
+            return await Promise.resolve('ok');
         objs = dbUtil.convert2DbFieldName(tableName, objs);
         let insertSql = dbUtil.createBulkUpdateSql(tableName, objs);
-        return await db.query(insertSql.sql, insertSql.params, connection);
+        await db.query(insertSql.sql, insertSql.params, connection);
+        return 'ok';
     };
 
     exportsObj.deleteByIds = async function (tableName, ids, connection) {

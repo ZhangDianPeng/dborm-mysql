@@ -377,7 +377,7 @@ describe('sampleDao', function(){
                 }
             };
             return sampleDao.update(sample, id0).then(res =>{
-                res.should.to.be.instanceOf(Object);
+                res.should.to.be.equal('ok');
             })
         });
         it('update with nullFields', function (){
@@ -393,7 +393,7 @@ describe('sampleDao', function(){
                 }
             };
             return sampleDao.update(sample, id0).then(res =>{
-                res.should.to.be.instanceOf(Object);
+                res.should.to.be.equal('ok');
             })
         });
         it('update with noUpdateTime', function (){
@@ -410,7 +410,7 @@ describe('sampleDao', function(){
                 }
             };
             return sampleDao.update(sample, id0).then(res =>{
-                res.should.to.be.instanceOf(Object);
+                res.should.to.be.equal('ok');
             })
         });
     });
@@ -427,7 +427,7 @@ describe('sampleDao', function(){
                 }
             };
             return sampleDao.updateByIds(sample, [id0, id1]).then(res =>{
-                res.should.to.be.instanceOf(Object);
+                res.should.to.be.equal('ok');
             })
         });
     });
@@ -444,7 +444,7 @@ describe('sampleDao', function(){
                 }
             };
             return sampleDao.updateByQuery(sample, {projectId: 2, inFields: {id: [id0, id1]}}).then(res =>{
-                res.should.to.be.instanceOf(Object);
+                res.should.to.be.equal('ok');
             })
         });
         it('不能无条件更新数据', function (){
@@ -485,12 +485,12 @@ describe('sampleDao', function(){
                 }
             };
             return sampleDao.updateBulk([sample,sample1]).then(res =>{
-                res.should.to.be.instanceOf(Object);
+                res.should.to.be.equal('ok');
             })
         });
         it('使用updateBulk更新空数据', function (){
             return sampleDao.updateBulk([]).then(res =>{
-                res.should.to.be.instanceOf(Object);
+                res.should.to.be.equal('ok');
             })
         });
     });
