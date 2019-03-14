@@ -111,10 +111,11 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
                     try{
                         dataRow[field] = JSON.parse(dataRow[field]);
                     }catch(err){
+                        let errMsg = `data error in mysql, tableName:${tableName}, dataRow:${JSON.stringify(dataRow)}, field:${field}`;
                         if(ignoreDataError){
-                            dataRow[field] = {};
+                            dataRow[field] = {reason: errMsg};
                         }else{
-                            throw new Error(`data error in mysql, tableName:${tableName}, dataRow:${JSON.stringify(dataRow)}, field:${field}`);
+                            throw new Error(errMsg);
                         }
                     }
                 }
