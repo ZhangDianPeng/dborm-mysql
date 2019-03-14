@@ -6,7 +6,7 @@ const Err = require('./err');
 const commonUtil = require('./commonUtil');
 const _ = require('lodash');
 
-module.exports = (config, {dbCode = 733}) => {
+module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
     let {db2ramFieldMap : db2ramFieldMaps, textDbFieldsMap: textDbFields} = config;
 
     let dbUtil = {};
@@ -111,7 +111,11 @@ module.exports = (config, {dbCode = 733}) => {
                     try{
                         dataRow[field] = JSON.parse(dataRow[field]);
                     }catch(err){
-                        throw new Error(`data error in mysql, dataRow:${JSON.stringify(dataRow)}, field:${field}`);
+                        if(ignoreDataError){
+                            dataRow[field] = {};
+                        }else{
+                            throw new Error(`data error in mysql, tableName:${tableName}, dataRow:${JSON.stringify(dataRow)}, field:${field}`);
+                        }
                     }
                 }
                 if (fieldMap.hasOwnProperty(field)) {

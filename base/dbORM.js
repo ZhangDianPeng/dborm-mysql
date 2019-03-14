@@ -6,14 +6,14 @@ const dbUtilOrigin = require('./dbUtil');
 
 let dbFunss = (config) => {
     let {dbConfig, log, options = {}} = config;
-    let {noConvertDbCodes = [], dbCode = 733} = options;
+    let {noConvertDbCodes = [], dbCode = 733, ignoreDataError = false} = options;
     let exportsObj = {};
     let db = dbOrigin(dbConfig, {
         log: options.log || log,
         noConvertDbCodes,
         dbCode
     });
-    let dbUtil = dbUtilOrigin(config, {dbCode});
+    let dbUtil = dbUtilOrigin(config, {dbCode, ignoreDataError});
     exportsObj.db = db;
     exportsObj.dbUtil = dbUtil;
 
