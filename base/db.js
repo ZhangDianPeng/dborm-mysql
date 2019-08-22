@@ -80,11 +80,11 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
         return new Promise(function (resolve, reject) {
             if (connection) {
                 query = connection.query(sql, sqlParam, function (err, rows) {
-                    if(log){
+                    if(log || process.SQL_LOG){
                         console.log(query.sql);
                     }
                     if (err) {
-                        if(!log){
+                        if(!log&&!process.SQL_LOG){
                             console.log(query.sql);
                         }
                         err.code = dbCode;
@@ -96,12 +96,12 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
             } else {
                 db.getConnection().then(function (connection) {
                     query = connection.query(sql, sqlParam, function (err, rows) {
-                        if(log){
+                        if(log || process.SQL_LOG){
                             console.log(query.sql);
                         }
                         connection.release();
                         if (err) {
-                            if(!log){
+                            if(!log&&!process.SQL_LOG){
                                 console.log(query.sql);
                             }
                             err.code = dbCode;
