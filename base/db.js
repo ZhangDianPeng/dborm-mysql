@@ -78,6 +78,12 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
     db.query = function (sql, sqlParam, connection) {
         let query;
         return new Promise(function (resolve, reject) {
+            if(process.MYSQL_READ_ONLY  && !sql.toLowerCase().trimLeft().startsWith('select')){
+                reject({
+                    code: 739,
+                    message: 'process.MYSQL_READ_ONLY is true，you can not execute update sql'
+                });
+            }
             if (connection) {
                 query = connection.query(sql, sqlParam, function (err, rows) {
                     if(log || process.SQL_LOG){

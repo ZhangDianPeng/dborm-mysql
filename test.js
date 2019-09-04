@@ -27,6 +27,8 @@ let dbORM = require('./index')({
     }
 });
 
+// process.MYSQL_READ_ONLY = true;
+
 const TableName = 'sample';
 let sampleDao = dbORM(TableName);
 let {dbUtil, db} = sampleDao;
