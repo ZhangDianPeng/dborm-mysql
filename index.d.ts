@@ -49,7 +49,7 @@ interface textDbFieldsMap {}
 interface options {
     log: string;
     dbCode: number;
-    noConvertDbCodes: Array
+    noConvertDbCodes: Array<number>
 }
 
 declare function dbORM(
@@ -68,10 +68,10 @@ declare namespace dbORM {
     interface ORM_DB {
         pool: mysql.Pool,
         getConnection(): Promise<mysql.Connection>,
-        wrapTransaction(fn: Function, nth: number): Promise<any>,
-        query(sql: string, sql: Array, connection?: mysql.Connection): Promise<any>,
+        wrapTransaction(fn: Function, nth: number): Function,
+        query(sql: string, params: Array<any>, connection?: mysql.Connection): Promise<any>,
         beginTransaction(): Promise<mysql.Connection>,
-        commitTransaction(conn: mysql.Connection): Promise<>,
+        commitTransaction(conn: mysql.Connection): Promise<any>,
         rollbackTransaction(conn: mysql.Connection): Promise<any>
     }
 
