@@ -321,7 +321,9 @@ describe('sampleDao', function(){
     describe('findOne', function(){
         let query = {
             selectFields: 'projectId',
-            projectId: 1
+            projectId: 1,
+            offset: -1,
+            limit: 20
         };
         it('return One dashboard', function (){
             return sampleDao.findOne(query).then(res =>{

@@ -68,6 +68,10 @@ let dbFunss = (config) => {
     };
 
     exportsObj.findOne = async function (tableName, query, connection) {
+        Object.assign(query, {
+            offset: 0,
+            limit: 1
+        });
         return await exportsObj.getList(tableName, query, connection).then(res => res && res[0]);
     };
 
