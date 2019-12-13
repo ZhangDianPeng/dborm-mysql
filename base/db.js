@@ -33,7 +33,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
         });
     };
 
-    db.wrapTransaction = function (fn, nth) {
+    db.wrapTransaction = function (fn, nth, timeout) {
         const Message = '等待事务超时';
         return function () {
             let ctx = this;
@@ -51,7 +51,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                             new Promise((res) => {
                                 setTimeout(() => {
                                     res(Message);
-                                }, 50000);
+                                }, timeout || 50000);
                             })
                         ]);
                         if(result === Message){
