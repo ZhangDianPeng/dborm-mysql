@@ -81,7 +81,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
             if(process.MYSQL_READ_ONLY  && !sql.toLowerCase().trimLeft().startsWith('select')){
                 reject({
                     code: 739,
-                    message: 'process.MYSQL_READ_ONLY is true，you can not execute update sql'
+                    message: '当前系统正在维护中，不能使用编辑功能'
                 });
             }
             if (connection) {
