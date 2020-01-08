@@ -4,10 +4,19 @@
 
 let mysql = require('mysql');
 const co = require('co');
+let shortUuid = require('short-uuid');
+let moment = require('moment');
 
 function initMysqlPool(db, dbConfig) {
     db.pool = mysql.createPool(dbConfig);
 }
+
+
+let logSql = (connection, rows, sql) => {
+    let insertIdLog = (rows && rows.insertId) ? `[insertId = ${rows.insertId}] ` : '';
+    console.log(`[${connection.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] ${insertIdLog} ${sql}`);
+};
+
 
 module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
     let db = {
@@ -26,6 +35,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                     }
                     reject(err);
                 } else {
+                    connection.connectionLogId = shortUuid().new().slice(0, 6);
                     reconnectionTime = 0;
                     resolve(connection);
                 }
@@ -87,11 +97,11 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
             if (connection) {
                 query = connection.query(sql, sqlParam, function (err, rows) {
                     if(log || process.SQL_LOG){
-                        console.log(query.sql);
+                        logSql(connection, rows, query.sql);
                     }
                     if (err) {
                         if(!log&&!process.SQL_LOG){
-                            console.log(query.sql);
+                            logSql(connection, rows, query.sql);
                         }
                         err.code = dbCode;
                         reject(err);
@@ -103,12 +113,12 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                 db.getConnection().then(function (connection) {
                     query = connection.query(sql, sqlParam, function (err, rows) {
                         if(log || process.SQL_LOG){
-                            console.log(query.sql);
+                            logSql(connection, rows, query.sql);
                         }
                         connection.release();
                         if (err) {
                             if(!log&&!process.SQL_LOG){
-                                console.log(query.sql);
+                                logSql(connection, rows, query.sql);
                             }
                             err.code = dbCode;
                             reject(err);
@@ -126,6 +136,9 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
     db.beginTransaction = function () {
         let p = new Promise(function (resolve, reject) {
             db.getConnection().then(function (conn) {
+                if(log || process.SQL_LOG){
+                    console.log(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] beginTransaction`);
+                }
                 conn.beginTransaction(function (err) {
                     if (err) {
                         conn.rollback(function () {
@@ -148,6 +161,9 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                 if (err) {
                     reject(err);
                 } else {
+                    if(log || process.SQL_LOG){
+                        console.log(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] commitTransaction`);
+                    }
                     // conn.release();
                     resolve('success');
                 }
@@ -158,6 +174,9 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
     db.rollbackTransaction = function (conn) {
         return new Promise(function (resolve, reject) {
             conn.rollback(function (err, suc) {
+                if(log || process.SQL_LOG){
+                    console.log(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] rollbackTransaction`);
+                }
                 resolve();
             });
         });
