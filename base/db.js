@@ -120,6 +120,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                             if(!log&&!process.SQL_LOG){
                                 logSql(connection, rows, query.sql);
                             }
+                            connection.destroy();
                             err.code = dbCode;
                             reject(err);
                         } else {
