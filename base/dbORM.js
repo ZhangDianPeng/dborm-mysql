@@ -260,7 +260,7 @@ let dbFunss = (config) => {
 module.exports = (config) => {
     let dbFuns = dbFunss(config);
     let {options = {}} = config;
-    let {dbCode = 733} = options;
+    let {dbCode = 733, noConvertDbCodes = []} = options;
     let result = function(tableName){
         let obj = {
             db: dbFuns.db,
@@ -269,7 +269,9 @@ module.exports = (config) => {
         Object.keys(dbFuns).forEach(key => {
             if(key !== 'db' && key !== 'dbUtil'){
                 obj[key] = (...rest) => dbFuns[key].apply(null, [tableName, ...rest]).catch(err => {
-                    err.code = dbCode;
+                    if(!noConvertDbCodes.includes(dbCode)){
+                        err.code = dbCode;
+                    }
                     throw err;
                 });
             }
