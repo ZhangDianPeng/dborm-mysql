@@ -1,6 +1,6 @@
 {
   "name": "dborm-mysql",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "description": "a NodeJs ORM for mysql",
   "main": "index.js",
   "types": "index.d.ts",
