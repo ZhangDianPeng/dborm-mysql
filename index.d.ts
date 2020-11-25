@@ -68,7 +68,7 @@ declare namespace dbORM {
     interface ORM_DB {
         pool: mysql.Pool,
         getConnection(): Promise<mysql.Connection>,
-        wrapTransaction(fn: Function, nth: number): Function,
+        wrapTransaction(fn: Function, nth: number, timeout: number): (...args: any[]) => Promise<any>,
         query(sql: string, params: Array<any>, connection?: mysql.Connection): Promise<any>,
         beginTransaction(): Promise<mysql.Connection>,
         commitTransaction(conn: mysql.Connection): Promise<any>,
