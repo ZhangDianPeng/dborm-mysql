@@ -101,7 +101,7 @@ let dbFunss = (config) => {
     };
 
     exportsObj.pageQuery = async function (tableName, query, connection) {
-        let {offset, limit, initSql, initParams = [], keyword, sort, returnFields = ['count', 'list'], initSessionSql} = query;
+        let {offset, limit, initSql, initParams = [], keyword, sort, returnFields = ['count', 'list'], asFields = [], initSessionSql} = query;
         let countSql = `select count(*) as count from (${initSql}) pageTable `, listSql = `select * from (${initSql}) pageTable `;
         let countParams = [].concat(initParams), listParams = [].concat(initParams);
 
@@ -122,7 +122,7 @@ let dbFunss = (config) => {
             sort = Array.isArray(sort) ? sort : [sort];
             let orderBySqls = sort.map(subSort => {
                 let [field, mode] = subSort.split(':');
-                field = dbUtil.toDbFieldNames(tableName, [field], [field])[0];
+                field = dbUtil.toDbFieldNames(tableName, [field], asFields)[0];
                 return dbUtil.getOrderBySql(field, mode, 'pageTable', [field]);
             }).filter(sql => sql.length > 0);
             if(orderBySqls.length){
