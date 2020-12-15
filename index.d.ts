@@ -68,7 +68,7 @@ declare namespace dbORM {
     interface ORM_DB {
         pool: mysql.Pool,
         getConnection(): Promise<mysql.Connection>,
-        wrapTransaction(fn: Function, nth: number, timeout: number): (...args: any[]) => Promise<any>,
+        wrapTransaction(fn: Function, nth: number, timeout?: number): (...args: any[]) => Promise<any>,
         query(sql: string, params: Array<any>, connection?: mysql.Connection): Promise<any>,
         beginTransaction(): Promise<mysql.Connection>,
         commitTransaction(conn: mysql.Connection): Promise<any>,
@@ -85,38 +85,38 @@ declare namespace dbORM {
         /**
          * 将data中key为数据库的字段名称转换为内存的字段名称
          */
-        convert2RamFieldName(tableName: string, data: object|Array): any,
+        convert2RamFieldName(tableName: string, data: object|Array<any>): any,
         /**
          * 将data中key为内存中的字段名称转换为数据库中的名称
          */
-        convert2DbFieldName(tableName: string, data: object|Array): any,
+        convert2DbFieldName(tableName: string, data: object|Array<any>): any,
         /**
          * 将fieldNames转换为数据库对应的名字, insertFieldNames表示有些自定义的字段不需要转换
          */
-        toDbFieldNames(tableName: string, fieldNames: Array, insertFieldNames?: Array): string,
+        toDbFieldNames(tableName: string, fieldNames: Array<any>, insertFieldNames?: Array<any>): string,
         /**
          * 创建一次插入一条数据的sql相关信息
          */
-        createInsertSql(tableName: string, obj: any): { params: Array<Array>, sql: string },
+        createInsertSql(tableName: string, obj: any): { params: Array<Array<any>>, sql: string },
         /**
          * 创建一次性插入多条数据的sql相关信息
          */
-        createBulkInsertSql(tableName: string, obj: Array<any>): { params: Array<Array>, sql: string },
+        createBulkInsertSql(tableName: string, obj: Array<any>): { params: Array<Array<any>>, sql: string },
         /**
          * 从给定的fieldNames中选择where字段，其中kwFieldName表示关键字查询对应的字段
          */
-        createWhereQuery(obj: any, tableName: string, insertFieldNameMap?: any): { params: Array, sql: string },
+        createWhereQuery(obj: any, tableName: string, insertFieldNameMap?: any): { params: Array<any>, sql: string },
         /**
          * 从给定的fieldNames中查找要更新的字段，创建更新sql语句
          */
-        createUpdateQuery(tableName: string, obj: any): { params: Array, sql: string },
-        createBulkUpdateSql(tableName: string, objs: Array<any>): { params: Array, sql: string },
+        createUpdateQuery(tableName: string, obj: any): { params: Array<any>, sql: string },
+        createBulkUpdateSql(tableName: string, objs: Array<any>): { params: Array<any>, sql: string },
         /**
          * mode = 1或者mode = 2 按照中文升降排序，mode = 3 或者 mode = 4按照英文升降排序
          */
-        getOrderBySql(field: string, mode: number, tableName: string, insertFieldNames?: Array): string,
-        createSelectSql(tableName: string, selectFields?: Array<string>): { sql: string, insertFieldNames: Array, insertFieldNameMap: any },
-        convertSort(sort: string, strFields: Array): string
+        getOrderBySql(field: string, mode: number, tableName: string, insertFieldNames?: Array<any>): string,
+        createSelectSql(tableName: string, selectFields?: Array<string>): { sql: string, insertFieldNames: Array<any>, insertFieldNameMap: any },
+        convertSort(sort: string, strFields: Array<any>): string
     }
 
     export interface ORMTableInstanceConstructor {
@@ -126,9 +126,11 @@ declare namespace dbORM {
             db: ORM_DB,
             dbUtil: ORM_DBUtil,
             // 这里原生 mysql 是 any 类型，但是由于我们 orm 框架的实现，我可以理解为返回数组
-            getList(query: any, connection?: mysql.Connection): Promise<Array>,
-            findOne(query: any, connection?: mysql.Connection): Promise<Array>,
-            getListByIds(ids: Array<number>, connection?: mysql.Connection): Promise<Array>,
+            getList(query: any, connection?: mysql.Connection): Promise<Array<any>>,
+            findOne(query: any, connection?: mysql.Connection): Promise<any>,
+            getMapByField(query: any, connection?: mysql.Connection): Promise<Map<string, Array<any>>>,
+            getGroupByField(query: any, connection?: mysql.Connection): Promise<Map<string, any>>,
+            getListByIds(ids: Array<number>, connection?: mysql.Connection): Promise<Array<any>>,
             getCount(query: any, connection?: mysql.Connection): Promise<number>,
             pageQuery(query: any, connection?: mysql.Connection): Promise<{ list: Array<any>, count: number }>,
             add(data: any, connection?: mysql.Connection): Promise<number>,
@@ -139,7 +141,7 @@ declare namespace dbORM {
             get(id: number, connection?: mysql.Connection): Promise<any>,
             createBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
             updateBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
-            deleteByIds(ids?: Array<number>, connection: mysql.Connection): Promise<any>
+            deleteByIds(ids?: Array<number>, connection?: mysql.Connection): Promise<any>
         };
     }
 

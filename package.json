@@ -5,12 +5,13 @@
   "main": "index.js",
   "types": "index.d.ts",
   "dependencies": {
+    "@types/node": "^14.14.13",
     "co": "^4.6.0",
     "lodash": "^4.17.4",
+    "moment": "^2.24.0",
     "mysql": "^2.14.1",
-    "util": "^0.10.3",
     "short-uuid": "^2.2.0",
-    "moment": "^2.24.0"
+    "util": "^0.10.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",

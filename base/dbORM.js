@@ -75,6 +75,23 @@ let dbFunss = (config) => {
         return await exportsObj.getList(tableName, query, connection).then(res => res && res[0]);
     };
 
+    exportsObj.getMapByField = async function (tableName, query, connection) {
+        if (_.isNil(_.get(query, 'byField'))) {
+            throw new Error(`getMapByField need <byField>`);
+        }
+        let list = await exportsObj.getList(tableName, query, connection);
+        let byFields = list.map(item => item[byField]);
+        return _.zipObject(byFields, list);
+    };
+
+    exportsObj.getGroupByField = async function (tableName, query, connection) {
+        if (_.isNil(_.get(query, 'byField'))) {
+            throw new Error(`getGroupByField need <byField>`);
+        }
+        let list = await exportsObj.getList(tableName, query, connection);
+        return _.groupBy(list, item => item[byField]);
+    };
+
     exportsObj.getListByIds = async function (tableName, ids, connection) {
         if(!ids || !ids.length){
             return [];
