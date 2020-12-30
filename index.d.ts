@@ -104,11 +104,11 @@ declare namespace dbORM {
         /**
          * 创建一次插入一条数据的sql相关信息
          */
-        createInsertSql(tableName: string, obj: any): { params: Array<Array<String>>, sql: string },
+        createInsertSql(tableName: string, obj: any): { params: Array<Array<any>>, sql: string },
         /**
          * 创建一次性插入多条数据的sql相关信息
          */
-        createBulkInsertSql(tableName: string, obj: Array<any>): { params: Array<Array<String>>, sql: string },
+        createBulkInsertSql(tableName: string, obj: Array<any>): { params: Array<Array<any>>, sql: string },
         /**
          * 从给定的fieldNames中选择where字段，其中kwFieldName表示关键字查询对应的字段
          */
