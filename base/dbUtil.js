@@ -169,11 +169,11 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
         judgeTable(tableName);
         let fieldMap = ram2dbFieldMaps[tableName];
         return fieldNames.map(fieldName => {
-            if (!util.isNullOrUndefined(fieldMap[fieldName]))
-                return fieldMap[fieldName];
-            else if (insertFieldNames.includes(fieldName)){
+            if (insertFieldNames.includes(fieldName)){
                 return fieldName;
-            } else {
+            }else if (!util.isNullOrUndefined(fieldMap[fieldName])){
+                return fieldMap[fieldName]
+            }else {
                 throw new Error(`<${tableName}>中不存在该字段<${fieldName}>`);
             }
         });

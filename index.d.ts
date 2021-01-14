@@ -52,12 +52,19 @@ interface options {
     noConvertDbCodes: Array<number>
 }
 
-declare function dbORM(
-    dbConfig,
-    db2ramFieldMap,
-    textDbFieldsMap,
-    options
-): dbORM.ORMTableInstanceConstructor
+
+interface dbORMParams {
+    dbConfig: dbConfig,
+    db2ramFieldMap: db2ramFieldMap,
+    textDbFieldsMap: textDbFieldsMap,
+    options: options
+}
+
+/**
+ *
+ * @param params
+ */
+declare function dbORM(params: dbORMParams): dbORM.ORMTableInstanceConstructor
 
 /*~ If you want to expose types from your module as well, you can
  *~ place them in this block. Often you will want to describe the
