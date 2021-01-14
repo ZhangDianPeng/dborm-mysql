@@ -317,7 +317,7 @@ describe('sampleDao', function(){
         });
     });
 
-    //getListByIds接口
+    //findOne接口
     describe('findOne', function(){
         let query = {
             selectFields: 'projectId',
