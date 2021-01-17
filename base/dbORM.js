@@ -25,7 +25,7 @@ let dbFunss = (config) => {
 
         query = dbUtil.convert2DbFieldName(tableName, query);
         let whereSql = dbUtil.createWhereQuery(query, tableName, insertFieldNameMap);
-        if(whereSql.sql.length){ 
+        if(whereSql.sql.length){
             sql += ' where ' + whereSql.sql;
             params = params.concat(whereSql.params);
         }
@@ -76,7 +76,8 @@ let dbFunss = (config) => {
     };
 
     exportsObj.getMapByField = async function (tableName, query, connection) {
-        if (_.isNil(_.get(query, 'byField'))) {
+        let byField = _.get(query, 'byField');
+        if (_.isNil(byField)) {
             throw new Error(`getMapByField need <byField>`);
         }
         let list = await exportsObj.getList(tableName, query, connection);
@@ -85,7 +86,8 @@ let dbFunss = (config) => {
     };
 
     exportsObj.getGroupByField = async function (tableName, query, connection) {
-        if (_.isNil(_.get(query, 'byField'))) {
+        let byField = _.get(query, 'byField');
+        if (_.isNil(byField)) {
             throw new Error(`getGroupByField need <byField>`);
         }
         let list = await exportsObj.getList(tableName, query, connection);
