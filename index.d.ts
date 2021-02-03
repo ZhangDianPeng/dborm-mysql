@@ -148,7 +148,8 @@ declare namespace dbORM {
             get(id: number, connection?: mysql.Connection): Promise<any>,
             createBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
             updateBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
-            deleteByIds(ids?: Array<number>, connection?: mysql.Connection): Promise<any>
+            deleteByIds(ids?: Array<number>, connection?: mysql.Connection): Promise<any>,
+            [key: string]: any
         };
     }
 
