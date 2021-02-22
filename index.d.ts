@@ -47,7 +47,7 @@ interface db2ramFieldMap {}
 interface textDbFieldsMap {}
 
 interface options {
-    log: string;
+    log: boolean;
     dbCode: number;
     noConvertDbCodes: Array<number>
 }
