@@ -126,29 +126,49 @@ declare namespace dbORM {
         convertSort(sort: string, strFields: Array<any>): string
     }
 
+    type query<T> = {
+        /** defined mysql "like" info， */
+        keyword?: any,
+        /** defined mysql "offset" info */
+        offset?: number,
+        /** defined mysql "limit" info */
+        limit?: number,
+        /** defined mysql "in" info */
+        inFields?: {
+            [k in keyof T]?: any[]
+        }
+        /** defined mysql "select" info */
+        selectFields?: string[],
+        /** defined mysql "order by" info */
+        sort?: string | string[],
+        initSql?: string,
+        initParams?: any,
+        initSessionSql?: string,
+    } & Partial<T>
+
     export interface ORMTableInstanceConstructor {
         db: ORM_DB;
         dbUtil: ORM_DBUtil;
-        (tableName: string): {
+        <T>(tableName: string): {
             db: ORM_DB,
             dbUtil: ORM_DBUtil,
             // 这里原生 mysql 是 any 类型，但是由于我们 orm 框架的实现，我可以理解为返回数组
-            getList(query: any, connection?: mysql.Connection): Promise<Array<any>>,
-            findOne(query: any, connection?: mysql.Connection): Promise<any>,
+            getList(query: query<T>, connection?: mysql.Connection): Promise<Array<T>>,
+            findOne(query: Omit<query<T>, 'offset'|'limit'>, connection?: mysql.Connection): Promise<T>,
             getMapByField(query: any, connection?: mysql.Connection): Promise<Map<string, Array<any>>>,
             getGroupByField(query: any, connection?: mysql.Connection): Promise<Map<string, any>>,
-            getListByIds(ids: Array<number>, connection?: mysql.Connection): Promise<Array<any>>,
-            getCount(query: any, connection?: mysql.Connection): Promise<number>,
-            pageQuery(query: any, connection?: mysql.Connection): Promise<{ list: Array<any>, count: number }>,
-            add(data: any, connection?: mysql.Connection): Promise<number>,
-            delete(data: any, connection?: mysql.Connection): Promise<any>,
-            updateByIds(data: any, ids?: Array<number>, connection?: mysql.Connection): Promise<any>,
-            update(data: any, id: number, connection?: mysql.Connection): Promise<any>,
-            updateByQuery(data: any, query: any, connection?: mysql.Connection): Promise<any>,
-            get(id: number, connection?: mysql.Connection): Promise<any>,
-            createBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
-            updateBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
-            deleteByIds(ids?: Array<number>, connection?: mysql.Connection): Promise<any>,
+            getListByIds(ids: Array<number>, connection?: mysql.Connection): Promise<Array<T>>,
+            getCount(query: Omit<query<T>, 'offset'|'limit'>, connection?: mysql.Connection): Promise<number>,
+            pageQuery(query: query<T>, connection?: mysql.Connection): Promise<{ list: Array<T>, count: number }>,
+            add(data: Partial<T>, connection?: mysql.Connection): Promise<number>,
+            delete(data: query<T>, connection?: mysql.Connection): Promise<any>,
+            updateByIds(data: Partial<T> & { nullFields?: string[]}, ids?: Array<number>, connection?: mysql.Connection): Promise<any>,
+            update(data: Partial<T> & {nullFields?: string[]}, id: number, connection?: mysql.Connection): Promise<any>,
+            updateByQuery(data: Partial<T> & {nullFields?: string[]}, query: query<T>, connection?: mysql.Connection): Promise<any>,
+            get(id: number, connection?: mysql.Connection): Promise<T>,
+            createBulk(objs?: Array<Partial<T>>, connection?: mysql.Connection): Promise<any>,
+            updateBulk(objs?: Array<Partial<T> & { id: number}>, connection?: mysql.Connection): Promise<any>,
+            deleteByIds(ids?: Array<number>, connection?: mysql.Connection): Promise<any>
             [key: string]: any
         };
     }
