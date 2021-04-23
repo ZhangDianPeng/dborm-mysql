@@ -10,9 +10,9 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
     let {db2ramFieldMap : db2ramFieldMaps, textDbFieldsMap: textDbFields} = config;
 
     let dbUtil = {};
-    
+
     let tableNames = Object.keys(textDbFields);
-    
+
     dbUtil.getFieldNames = function(tableName, extra = false){
         let fieldNames = Object.keys(db2ramFieldMaps[tableName]);
         if(extra){
@@ -20,7 +20,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
         }
         return fieldNames;
     };
-    
+
     dbUtil.parseKeyword = function(keyword){
         if(typeof keyword == 'string'){
             keyword = keyword.replace(/\\/g, '\\\\');
@@ -270,11 +270,11 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
                     keyword = keyword.join(':');
                     field = dbUtil.toDbFieldNames(tableName, [field], insertFieldNames)[0];
                     let realField = dbUtil.getWhereFields(tableName, field, insertFieldNameMap);
-                    whereArr.push(realField + ' like ?');
+                    whereArr.push({ sql: realField + ' like ?', fieldName });
                     if (keyword) {
                         keyword = dbUtil.parseKeyword(keyword);
                     }
-                    params.push('%' + keyword + '%');
+                    params.push({ value: '%' + keyword + '%', fieldName });
                 }else{
                     let orSqls = [];
                     Object.keys(keywordRes).map(field => {
@@ -284,10 +284,10 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
                             let realField = dbUtil.getWhereFields(tableName, field, insertFieldNameMap);
                             orSqls.push(realField + ' like ?');
                             subKeyword = dbUtil.parseKeyword(subKeyword);
-                            params.push('%' + subKeyword + '%');
+                            params.push({ value: '%' + subKeyword + '%', fieldName });
                         }
                     });
-                    whereArr.push('(' + orSqls.join(' or ') + ')');
+                    whereArr.push({ sql: '(' + orSqls.join(' or ') + ')', fieldName });
                 }
             } else if(fieldName == 'inFields'){
                 let inFields = obj[fieldName];
@@ -299,30 +299,36 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
                     if (value.length) {
                         let realField = dbUtil.getWhereFields(tableName, key, insertFieldNameMap);
                         inSqls.push(` ${realField} in (?) `);
-                        params.push(value);
+                        params.push({ value, fieldName });
                     }else{
                         inSqls.push('0=1');
                     }
                 });
                 if(inSqls.length){
-                    whereArr.push('(' + inSqls.join(' and ') + ')');
+                    whereArr.push({ sql: '(' + inSqls.join(' and ') + ')', fieldName });
                 }
             } else if(fieldName === 'customQuery'){
                 let customQuery = obj[fieldName];
                 if(customQuery.length){
-                    whereArr.push('(' + customQuery + ')');
+                    whereArr.push({ sql: '(' + customQuery + ')', fieldName });
                 }
             }else {
-                params.push(obj[fieldName]);
+                params.push({ value: obj[fieldName], fieldName });
                 //对于role，projectId=-1属于所有项目
                 if (tableName == 'role' && fieldName == 'project_id') {
-                    whereArr.push('(role.project_id = ? or role.project_id = -1)');
+                    whereArr.push({ sql: '(role.project_id = ? or role.project_id = -1)', fieldName });
                 } else {
                     let realField = dbUtil.getWhereFields(tableName, fieldName, insertFieldNameMap);
-                    whereArr.push(realField + '=?');
+                    whereArr.push({ sql: realField + '=?', fieldName });
                 }
             }
         }
+
+        // 根据传入 query 的字段顺序排序
+        const keys = Object.keys(obj);
+        params = params.sort((a,b) => keys.indexOf(a.fieldName) - keys.indexOf(b.fieldName)).map(i => i.value);
+        whereArr = whereArr.sort((a,b) => keys.indexOf(a.fieldName) - keys.indexOf(b.fieldName)).map(i => i.sql);
+
         return {
             params: params,
             sql: whereArr.join(' and ')
