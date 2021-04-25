@@ -11,14 +11,19 @@ function initMysqlPool(db, dbConfig) {
     db.pool = mysql.createPool(dbConfig);
 }
 
-
-let logSql = (connection, rows, sql) => {
+let logSql = (connection, rows, sql, startTime, logExecuteTime) => {
     let insertIdLog = (rows && rows.insertId) ? `[insertId = ${rows.insertId}] ` : '';
-    console.log(`[${connection.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] ${insertIdLog} ${sql}`);
+
+    let info = `[${connection.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}]`;
+    if(logExecuteTime){
+        const executeTime = (new Date()).getTime() - startTime.getTime();
+        info += `[execute time: ${executeTime}ms]`
+    }
+    info += `${insertIdLog} ${sql}`;
+    console.log(info);
 };
 
-
-module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
+module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => {
     let db = {
         pool: null
     };
@@ -84,7 +89,6 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
         };
     };
 
-
     db.query = function (sql, sqlParam, connection) {
         let query;
         return new Promise(function (resolve, reject) {
@@ -94,14 +98,17 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                     message: '当前系统正在维护中，不能使用编辑功能'
                 });
             }
+
+            const startTime = new Date();
+
             if (connection) {
                 query = connection.query(sql, sqlParam, function (err, rows) {
                     if(log || process.SQL_LOG){
-                        logSql(connection, rows, query.sql);
+                        logSql(connection, rows, query.sql, startTime, logExecuteTime);
                     }
                     if (err) {
                         if(!log&&!process.SQL_LOG){
-                            logSql(connection, rows, query.sql);
+                            logSql(connection, rows, query.sql, startTime, logExecuteTime);
                         }
                         err.code = dbCode;
                         reject(err);
@@ -113,12 +120,12 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode}) => {
                 db.getConnection().then(function (connection) {
                     query = connection.query(sql, sqlParam, function (err, rows) {
                         if(log || process.SQL_LOG){
-                            logSql(connection, rows, query.sql);
+                            logSql(connection, rows, query.sql, startTime, logExecuteTime);
                         }
                         connection.release();
                         if (err) {
                             if(!log&&!process.SQL_LOG){
-                                logSql(connection, rows, query.sql);
+                                logSql(connection, rows, query.sql, startTime, logExecuteTime);
                             }
                             connection.destroy();
                             err.code = dbCode;
