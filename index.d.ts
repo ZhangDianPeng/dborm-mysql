@@ -49,7 +49,8 @@ interface textDbFieldsMap {}
 interface options {
     log: boolean;
     dbCode: number;
-    noConvertDbCodes: Array<number>
+    noConvertDbCodes: Array<number>,
+    logExecuteTime?: boolean,
 }
 
 
