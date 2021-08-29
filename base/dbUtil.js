@@ -198,7 +198,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
             addFieldNames.push('modify_time');
         }
 
-        let sql = `INSERT INTO ${tableName} (${addFieldNames.join(',')}) VALUES(?)`;
+        let sql = `INSERT INTO ${tableName} (${addFieldNames.map(field => '`' + field + '`').join(',')}) VALUES(?)`;
         let params = addFieldNames.map(fieldName => obj[fieldName]);
         return {
             params: [params],
