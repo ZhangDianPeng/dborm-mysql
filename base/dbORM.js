@@ -158,23 +158,30 @@ let dbFunss = (config) => {
             listSql = initSessionSql + ';' + listSql;
             countSql = initSessionSql + ';' + countSql;
         }
-        let list, count;
+        let querys = []
         if(returnFields.includes('list')){
-            list = await db.query(listSql, listParams, connection).then(res => {
+            let list = db.query(listSql, listParams, connection).then(res => {
                 if(initSessionSql){
                     res = res[1];
                 }
                 return dbUtil.convert2RamFieldName(tableName, res);
             });
+            querys.push(list);
+        } else {
+            querys.push(Promise.resolve(null));
         }
         if(returnFields.includes('count')){
-            count = await db.query(countSql, countParams, connection).then(res => {
+            let count = db.query(countSql, countParams, connection).then(res => {
                 if(initSessionSql){
                     res = res[1];
                 }
                 return res[0].count;
             });
+            querys.push(count);
+        } else {
+            querys.push(Promise.resolve(null));
         }
+        let [list,count] = await Promise.all(querys);
         return {list, count};
     };
 
