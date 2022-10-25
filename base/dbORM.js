@@ -228,6 +228,19 @@ let dbFunss = (config) => {
         return 'ok';
     };
 
+    exportsObj.batchUpdateByIds = async function (tableName, data, ids, options = {}, connection) {
+        if (!ids || !ids.length) {
+            return await Promise.resolve('ok');
+        }
+        let {batchSize = 20} = options;
+        let offset = 0;
+        while (offset < ids.length) {
+            await exportsObj.updateByIds(tableName, data, ids.slice(offset, offset + batchSize), connection);
+            offset += batchSize;
+        }
+        return 'ok';
+    };
+
     exportsObj.update = async function (tableName, data, id, connection) {
         await exportsObj.updateByIds(tableName, data, [id], connection);
         return 'ok';

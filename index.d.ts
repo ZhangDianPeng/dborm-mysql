@@ -144,6 +144,7 @@ declare namespace dbORM {
             add(data: any, connection?: mysql.Connection): Promise<number>,
             delete(data: any, connection?: mysql.Connection): Promise<any>,
             updateByIds(data: any, ids?: Array<number>, connection?: mysql.Connection): Promise<any>,
+            batchUpdateByIds(data: any, ids?: Array<number>, options: any, connection?: mysql.Connection): Promise<any>,
             update(data: any, id: number | string, connection?: mysql.Connection): Promise<any>,
             updateByQuery(data: any, query: any, connection?: mysql.Connection): Promise<any>,
             get(id: number | string, connection?: mysql.Connection): Promise<any>,
