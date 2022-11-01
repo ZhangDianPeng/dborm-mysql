@@ -49,7 +49,8 @@ interface textDbFieldsMap {}
 interface options {
     log: boolean;
     dbCode: number;
-    noConvertDbCodes: Array<number>
+    noConvertDbCodes: Array<number>,
+    logExecuteTime?: boolean,
 }
 
 
@@ -143,9 +144,10 @@ declare namespace dbORM {
             add(data: any, connection?: mysql.Connection): Promise<number>,
             delete(data: any, connection?: mysql.Connection): Promise<any>,
             updateByIds(data: any, ids?: Array<number>, connection?: mysql.Connection): Promise<any>,
-            update(data: any, id: number, connection?: mysql.Connection): Promise<any>,
+            batchUpdateByIds(data: any, ids?: Array<number>, options: any, connection?: mysql.Connection): Promise<any>,
+            update(data: any, id: number | string, connection?: mysql.Connection): Promise<any>,
             updateByQuery(data: any, query: any, connection?: mysql.Connection): Promise<any>,
-            get(id: number, connection?: mysql.Connection): Promise<any>,
+            get(id: number | string, connection?: mysql.Connection): Promise<any>,
             createBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
             updateBulk(objs?: Array<any>, connection?: mysql.Connection): Promise<any>,
             deleteByIds(ids?: Array<number>, connection?: mysql.Connection): Promise<any>,

@@ -6,12 +6,13 @@ const dbUtilOrigin = require('./dbUtil');
 
 let dbFunss = (config) => {
     let {dbConfig, log, options = {}} = config;
-    let {noConvertDbCodes = [], dbCode = 733, ignoreDataError = false} = options;
+    let {noConvertDbCodes = [], dbCode = 733, ignoreDataError = false, logExecuteTime = true} = options;
     let exportsObj = {};
     let db = dbOrigin(dbConfig, {
         log: options.log || log,
         noConvertDbCodes,
-        dbCode
+        dbCode,
+        logExecuteTime //打印 sql 执行时间，默认开启
     });
     let dbUtil = dbUtilOrigin(config, {dbCode, ignoreDataError});
     exportsObj.db = db;
@@ -157,23 +158,30 @@ let dbFunss = (config) => {
             listSql = initSessionSql + ';' + listSql;
             countSql = initSessionSql + ';' + countSql;
         }
-        let list, count;
+        let querys = []
         if(returnFields.includes('list')){
-            list = await db.query(listSql, listParams, connection).then(res => {
+            let list = db.query(listSql, listParams, connection).then(res => {
                 if(initSessionSql){
                     res = res[1];
                 }
                 return dbUtil.convert2RamFieldName(tableName, res);
             });
+            querys.push(list);
+        } else {
+            querys.push(Promise.resolve(null));
         }
         if(returnFields.includes('count')){
-            count = await db.query(countSql, countParams, connection).then(res => {
+            let count = db.query(countSql, countParams, connection).then(res => {
                 if(initSessionSql){
                     res = res[1];
                 }
                 return res[0].count;
             });
+            querys.push(count);
+        } else {
+            querys.push(Promise.resolve(null));
         }
+        let [list,count] = await Promise.all(querys);
         return {list, count};
     };
 
@@ -221,6 +229,19 @@ let dbFunss = (config) => {
             sql += ' where id in (?)';
             params.push(updateIds);
             await db.query(sql, params, connection);
+        }
+        return 'ok';
+    };
+
+    exportsObj.batchUpdateByIds = async function (tableName, data, ids, options = {}, connection) {
+        if (!ids || !ids.length) {
+            return await Promise.resolve('ok');
+        }
+        let {batchSize = 20} = options;
+        let offset = 0;
+        while (offset < ids.length) {
+            await exportsObj.updateByIds(tableName, data, ids.slice(offset, offset + batchSize), connection);
+            offset += batchSize;
         }
         return 'ok';
     };
