@@ -460,6 +460,26 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
         }
     };
 
+    dbUtil.splitSize = function (list, batchSize = 5000) {
+        let length = list.length;
+        let partNum = Math.floor(length / batchSize) + 1;
+        let batch = [];
+        for (let j = 0; j < partNum; j++) {
+            let part = [];
+            for (let i = 0; i < batchSize; i++) {
+                if (length <= (i + j * batchSize)) {
+                    break;
+                }
+                part.push(list[i + j * batchSize]);
+            }
+            if (part.length === 0) {
+                break;
+            }
+            batch.push(part);
+        }
+        return batch;
+    };
+
     return dbUtil;
 };
 

@@ -208,15 +208,20 @@ let dbFunss = (config) => {
         if(!ids || !ids.length){
             return await Promise.resolve('ok');
         }
-        let sql = `update ${tableName} set `;
-        data = dbUtil.convert2DbFieldName(tableName, data);
-        let params = [];
-        let updateSql = dbUtil.createUpdateQuery(tableName, data);
-        sql += updateSql.sql;
-        params = params.concat(updateSql.params);
-        sql += ' where id in (?)';
-        params.push(ids);
-        await db.query(sql, params, connection);
+        let splitSize = data.splitSize || 5000;
+        let updateIdss = dbUtil.splitSize(ids, splitSize);
+        for (let index = 0; index < updateIdss.length; index++) {
+            const updateIds = updateIdss[index];
+            let sql = `update ${tableName} set `;
+            data = dbUtil.convert2DbFieldName(tableName, _.omit(data, 'splitSize'));
+            let params = [];
+            let updateSql = dbUtil.createUpdateQuery(tableName, data);
+            sql += updateSql.sql;
+            params = params.concat(updateSql.params);
+            sql += ' where id in (?)';
+            params.push(updateIds);
+            await db.query(sql, params, connection);
+        }
         return 'ok';
     };
 
