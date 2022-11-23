@@ -187,7 +187,7 @@ let dbFunss = (config) => {
 
     exportsObj.add = async function (tableName, data, connection) {
         // 添加数据, 不能包含 id 字段
-        if (data.id) {
+        if (data.id && !data.notDeleteIdProperty) {
             Reflect.deleteProperty(data, 'id');
         }
         data = dbUtil.convert2DbFieldName(tableName, data);
