@@ -191,11 +191,16 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
 
         if (!obj.create_time && fieldNames.includes('create_time')){
             obj.create_time = new Date();
-            addFieldNames.push('create_time');
+            if (!addFieldNames.includes('create_time')) {
+                addFieldNames.push('create_time');
+            }
         }
+
         if (!obj.modify_time && fieldNames.includes('modify_time')){
             obj.modify_time = new Date();
-            addFieldNames.push('modify_time');
+            if (!addFieldNames.includes('modify_time')) {
+                addFieldNames.push('modify_time');
+            }
         }
 
         let sql = `INSERT INTO ${tableName} (${addFieldNames.map(field => '`' + field + '`').join(',')}) VALUES(?)`;
