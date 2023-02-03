@@ -29,6 +29,14 @@ let dbFunss = (config) => {
         if(whereSql.sql.length){
             sql += ' where ' + whereSql.sql;
             params = params.concat(whereSql.params);
+        } else if (query.strict) {
+            delete query.strict;
+            if (whereSql.params.length < Object.keys(query).length) {
+                return await Promise.reject({
+                    code: dbCode,
+                    message: '不安全的 getList，存在 value 为空的筛选条件'
+                });
+            }
         }
 
         // 排序
