@@ -8,11 +8,11 @@ let db2ramFieldMap = require('./config/db2ramFieldMap.json');
 let textDbFieldsMap = require('./config/textDbFields.json');
 let dbConfig = {
     "connectionLimit": 10,
-    "database": "dev_netease",
-    "host": "dev.youdata.com",
-    "user": "sup_bigviz",
+    "database": "test",
+    "host": "127.0.0.1",
+    "user": "*****",
     "port": 3360,
-    "password": "Sdc2MslOsxw",
+    "password": "******",
     "multipleStatements": true
 };
 
