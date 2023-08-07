@@ -34,7 +34,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
         if(typeof keywordRes == 'string'){
             let [field, ...keyword] = keywordRes.split(':');
             keyword = keyword.join(':');
-            orSqls.push(tableName + '.' + field + ' like ?');
+            orSqls.push(tableName + '.`' + field + '` like ?');
             if (keyword) {
                 keyword = dbUtil.parseKeyword(keyword);
             }
@@ -43,7 +43,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
             Object.keys(keywordRes).map(field => {
                 let subKeyword = keywordRes[field];
                 if (subKeyword) {
-                    orSqls.push(tableName + '.' + field + ' like ?');
+                    orSqls.push(tableName + '.`' + field + '` like ?');
                     subKeyword = dbUtil.parseKeyword(subKeyword);
                     params.push('%' + subKeyword + '%');
                 }
@@ -59,7 +59,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
         if(insertFieldNameMap[field]){
             return '(' + insertFieldNameMap[field] + ')';
         }else{
-            return tableName + '.' + field;
+            return tableName + '.' + '`' + field + '`';
         }
     };
 
@@ -240,7 +240,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
         });
 
 
-        let sql = 'INSERT INTO ' + tableName + '(' + addFieldNames.join(',') + ')' + ' VALUES ?';
+        let sql = 'INSERT INTO ' + tableName + '(' + addFieldNames.map(field => '`' + field + '`').join(',') + ')' + ' VALUES ?';
         let params = objs.map(obj => addFieldNames.map(fieldName => obj[fieldName]));
         return {
             params: [params],
@@ -356,7 +356,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
                 let value = obj[fieldName];
                 if (nullFields.includes(fieldName) || !util.isNullOrUndefined(value)) {
                     params.push(value);
-                    updateArr.push(fieldName + '=?');
+                    updateArr.push('`' + fieldName + '`' + ' =?');
                 }
             });
         }
@@ -392,7 +392,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
                 obj.modify_time = new Date();
         });
         fieldNames = fieldNames.filter(fieldName => !util.isUndefined(objs[0][fieldName]));
-        let sql = 'INSERT INTO ' + tableName + '(' + fieldNames.join(',') + ')' + ' VALUES ?';
+        let sql = 'INSERT INTO ' + tableName + '(' + fieldNames.map(fieldName => '`' + fieldName + '`').join(',') + ')' + ' VALUES ?';
         let params = objs.map(obj => fieldNames.map(fieldName => obj[fieldName]));
         let updateField = [];
         fieldNames.forEach(function (field) {
@@ -441,7 +441,7 @@ module.exports = (config, {dbCode = 733, ignoreDataError = false}) => {
                 toSelectFields.push(field);
             }else {
                 if(field !== '*'){
-                    field = dbUtil.toDbFieldNames(tableName, [field])[0];
+                    field = '`' + dbUtil.toDbFieldNames(tableName, [field])[0] + '`';
                 }
                 toSelectFields.push(tableName + '.' + field);
             }

@@ -167,11 +167,11 @@ describe('sampleDao', function(){
                 }
             }).then(res => {
                 expect(res.count).to.be.a('number');
-                expect(res.list).to.be.an('undefined');
+                expect(res.list).to.be.an('null');
             })
         });
 
-        it('分页查询返回 only count', function (){
+        it('分页查询返回 only list', function (){
             return sampleDao.pageQuery({
                 initSql: 'select project_id as projectId, name from sample where id = ?',
                 initParams: [1],
@@ -183,7 +183,7 @@ describe('sampleDao', function(){
                     name: 'xx'
                 }
             }).then(res => {
-                expect(res.count).to.be.an('undefined');
+                expect(res.count).to.be.an('null');
                 expect(res.list).to.be.an('array');
             })
         });
