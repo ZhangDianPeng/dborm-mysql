@@ -91,6 +91,8 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
 
     db.query = function (sql, sqlParam, connection) {
         let currentStack = new Error().stack;
+        // new Error().stack的格式是：Error: 错误信息\n    at 函数名 (文件路径:行号:列号)... 去掉第一行即可获取当前函数的调用栈
+        currentStack = currentStack.split('\n').slice(1).join('\n');
         let query;
         return new Promise(function (resolve, reject) {
             if(process.MYSQL_READ_ONLY  && !sql.toLowerCase().trimLeft().startsWith('select')){
