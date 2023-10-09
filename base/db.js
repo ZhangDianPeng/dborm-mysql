@@ -90,6 +90,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
     };
 
     db.query = function (sql, sqlParam, connection) {
+        let currentStack = new Error().stack;
         let query;
         return new Promise(function (resolve, reject) {
             if(process.MYSQL_READ_ONLY  && !sql.toLowerCase().trimLeft().startsWith('select')){
@@ -111,6 +112,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
                             logSql(connection, rows, query.sql, startTime, logExecuteTime);
                         }
                         err.code = dbCode;
+                        err.stack = err.stack + currentStack;
                         reject(err);
                     } else {
                         resolve(rows);
@@ -135,6 +137,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
                         }
                     });
                 }).catch(function (err) {
+                    err.stack = err.stack + currentStack;
                     reject(err);
                 });
             }
