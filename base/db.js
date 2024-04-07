@@ -23,6 +23,12 @@ let logSql = (connection, rows, sql, startTime, logExecuteTime, logger) => {
     logger(info);
 };
 
+// 去掉报错信息行，只保留当前函数调用栈
+let getCurrentStack = (currentStack) => {
+    // new Error().stack的格式是：Error: 错误信息\n    at 函数名 (文件路径:行号:列号)... 去掉第一行即可获取当前函数的调用栈
+    return currentStack.split('\n').slice(1).join('\n');
+};
+
 module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logger}) => {
     let db = {
         pool: null
@@ -99,6 +105,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
     };
 
     db.query = function (sql, sqlParam, connection) {
+        let currentStack = new Error().stack;
         let query;
         return new Promise(function (resolve, reject) {
             if(process.MYSQL_READ_ONLY  && !sql.toLowerCase().trimLeft().startsWith('select')){
@@ -120,6 +127,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
                             logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                         }
                         err.code = dbCode;
+                        err.stack = err.stack + getCurrentStack(currentStack);
                         reject(err);
                     } else {
                         resolve(rows);
@@ -144,6 +152,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
                         }
                     });
                 }).catch(function (err) {
+                    err.stack = err.stack + getCurrentStack(currentStack);
                     reject(err);
                 });
             }
