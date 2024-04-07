@@ -10,6 +10,7 @@ let dbFunss = (config) => {
     let exportsObj = {};
     let db = dbOrigin(dbConfig, {
         log: options.log || log,
+        logger: options.logger || console.log,
         noConvertDbCodes,
         dbCode,
         logExecuteTime //打印 sql 执行时间，默认开启

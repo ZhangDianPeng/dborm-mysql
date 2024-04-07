@@ -11,44 +11,45 @@ function initMysqlPool(db, dbConfig) {
     db.pool = mysql.createPool(dbConfig);
 }
 
-let logSql = (connection, rows, sql, startTime, logExecuteTime) => {
+let logSql = (connection, rows, sql, startTime, logExecuteTime, logger) => {
     let insertIdLog = (rows && rows.insertId) ? `[insertId = ${rows.insertId}] ` : '';
 
     let info = `[${connection.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}]`;
     if(logExecuteTime){
         const executeTime = (new Date()).getTime() - startTime.getTime();
-        info += `[execute time: ${executeTime}ms]`
+        info += `[execute time: ${executeTime}ms]`;
     }
     info += `${insertIdLog} ${sql}`;
-    console.log(info);
+    logger(info);
 };
 
-module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => {
+module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logger}) => {
     let db = {
         pool: null
     };
     initMysqlPool(db, dbConfig);
     let reconnectionTime = 0;
     //获取数据连接，将回调转换为promise
-    db.getConnection = function () {
+    db.getConnection = function (options = {}) {
         return new Promise(function (resolve, reject) {
             db.pool.getConnection(function (err, connection) {
                 if (err) {
                     if(err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_SEQUENCE_TIMEOUT'){
-                        console.log('mysql reconnect， reconnect time:', reconnectionTime++);
+                        logger('mysql reconnect， reconnect time:', reconnectionTime++);
                         db.getConnection().then(resolve, reject);
                     }
                     reject(err);
                 } else {
-                    connection.connectionLogId = shortUuid().new().slice(0, 6);
+                    connection.connectionLogId = options.transId || shortUuid().new().slice(0, 6);
                     reconnectionTime = 0;
+                    connection.logSql = options.logSql;
                     resolve(connection);
                 }
             });
         });
     };
 
-    db.wrapTransaction = function (fn, nth, timeout) {
+    db.wrapTransaction = function (fn, nth, timeout, options = {}) {
         const Message = '等待事务超时';
         return function () {
             let ctx = this;
@@ -57,7 +58,15 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
                 return fn.apply(ctx, params);
             } else {
                 return (co.wrap(function* (params) {
-                    let conn = yield db.beginTransaction();
+                    let newOptions = Object.assign({}, options);
+                    if (options.transId && typeof options.transId === 'function'){
+                        newOptions.transId = options.transId(params);
+                    }
+                    if (options.logSql && typeof options.logSql === 'function'){
+                        newOptions.logSql = options.logSql(params);
+                    }
+
+                    let conn = yield db.beginTransaction(newOptions);
                     let result;
                     try {
                         params[nth] = conn;
@@ -103,12 +112,12 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
 
             if (connection) {
                 query = connection.query(sql, sqlParam, function (err, rows) {
-                    if(log || process.SQL_LOG){
-                        logSql(connection, rows, query.sql, startTime, logExecuteTime);
+                    if(connection.logSql || log || process.SQL_LOG){
+                        logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                     }
                     if (err) {
-                        if(!log&&!process.SQL_LOG){
-                            logSql(connection, rows, query.sql, startTime, logExecuteTime);
+                        if (!connection.logSql && !log && !process.SQL_LOG){
+                            logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                         }
                         err.code = dbCode;
                         reject(err);
@@ -119,13 +128,13 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
             } else {
                 db.getConnection().then(function (connection) {
                     query = connection.query(sql, sqlParam, function (err, rows) {
-                        if(log || process.SQL_LOG){
-                            logSql(connection, rows, query.sql, startTime, logExecuteTime);
+                        if(connection.logSql || log || process.SQL_LOG){
+                            logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                         }
                         connection.release();
                         if (err) {
-                            if(!log&&!process.SQL_LOG){
-                                logSql(connection, rows, query.sql, startTime, logExecuteTime);
+                            if (connection.logSql && !log && !process.SQL_LOG){
+                                logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                             }
                             connection.destroy();
                             err.code = dbCode;
@@ -141,11 +150,11 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
         });
     };
 
-    db.beginTransaction = function () {
+    db.beginTransaction = function (options) {
         let p = new Promise(function (resolve, reject) {
-            db.getConnection().then(function (conn) {
-                if(log || process.SQL_LOG){
-                    console.log(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] beginTransaction`);
+            db.getConnection(options).then(function (conn) {
+                if(options.logSql || log || process.SQL_LOG){
+                    logger(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] beginTransaction`);
                 }
                 conn.beginTransaction(function (err) {
                     if (err) {
@@ -170,7 +179,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
                     reject(err);
                 } else {
                     if(log || process.SQL_LOG){
-                        console.log(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] commitTransaction`);
+                        logger(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] commitTransaction`);
                     }
                     // conn.release();
                     resolve('success');
@@ -183,7 +192,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime}) => 
         return new Promise(function (resolve, reject) {
             conn.rollback(function (err, suc) {
                 if(log || process.SQL_LOG){
-                    console.log(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] rollbackTransaction`);
+                    logger(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] rollbackTransaction`);
                 }
                 resolve();
             });
