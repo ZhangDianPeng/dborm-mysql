@@ -48,7 +48,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
                 } else {
                     connection.connectionLogId = options.transId || shortUuid().new().slice(0, 6);
                     reconnectionTime = 0;
-                    connection.logSql = options.logSql;
+                    connection.logSql = options.transId || options.logSql || log || process.SQL_LOG;
                     resolve(connection);
                 }
             });
@@ -119,11 +119,11 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
 
             if (connection) {
                 query = connection.query(sql, sqlParam, function (err, rows) {
-                    if(connection.logSql || log || process.SQL_LOG){
+                    if(connection.logSql){
                         logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                     }
                     if (err) {
-                        if (!connection.logSql && !log && !process.SQL_LOG){
+                        if (!connection.logSql){
                             logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                         }
                         err.code = dbCode;
@@ -136,12 +136,12 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
             } else {
                 db.getConnection().then(function (connection) {
                     query = connection.query(sql, sqlParam, function (err, rows) {
-                        if(connection.logSql || log || process.SQL_LOG){
+                        if(connection.logSql){
                             logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                         }
                         connection.release();
                         if (err) {
-                            if (connection.logSql && !log && !process.SQL_LOG){
+                            if (!connection.logSql){
                                 logSql(connection, rows, query.sql, startTime, logExecuteTime, logger);
                             }
                             connection.destroy();
@@ -162,7 +162,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
     db.beginTransaction = function (options) {
         let p = new Promise(function (resolve, reject) {
             db.getConnection(options).then(function (conn) {
-                if(options.logSql || log || process.SQL_LOG){
+                if(conn.logSql){
                     logger(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] beginTransaction`);
                 }
                 conn.beginTransaction(function (err) {
@@ -187,7 +187,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
                 if (err) {
                     reject(err);
                 } else {
-                    if(log || process.SQL_LOG){
+                    if(conn.logSql){
                         logger(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] commitTransaction`);
                     }
                     // conn.release();
@@ -200,7 +200,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
     db.rollbackTransaction = function (conn) {
         return new Promise(function (resolve, reject) {
             conn.rollback(function (err, suc) {
-                if(log || process.SQL_LOG){
+                if(conn.logSql){
                     logger(`[${conn.connectionLogId}] [${moment().format('YYYY-MM-DD HH:mm:ss.mm.SSS')}] rollbackTransaction`);
                 }
                 resolve();
@@ -210,4 +210,3 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
 
     return db;
 };
-
