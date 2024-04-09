@@ -51,6 +51,7 @@ interface options {
     dbCode: number;
     noConvertDbCodes: Array<number>,
     logExecuteTime?: boolean,
+    logger?: any; 
 }
 
 
@@ -76,7 +77,7 @@ declare namespace dbORM {
     interface ORM_DB {
         pool: mysql.Pool,
         getConnection(): Promise<mysql.Connection>,
-        wrapTransaction(fn: Function, nth: number, timeout?: number): (...args: any[]) => Promise<any>,
+        wrapTransaction(fn: Function, nth: number, timeout?: number, options?: {transId?: any, logSql?: any}): (...args: any[]) => Promise<any>,
         query(sql: string, params: Array<any>, connection?: mysql.Connection): Promise<any>,
         beginTransaction(): Promise<mysql.Connection>,
         commitTransaction(conn: mysql.Connection): Promise<any>,
