@@ -10,6 +10,7 @@ let dbFunss = (config) => {
     let exportsObj = {};
     let db = dbOrigin(dbConfig, {
         log: options.log || log,
+        logger: options.logger || console.log,
         noConvertDbCodes,
         dbCode,
         logExecuteTime //打印 sql 执行时间，默认开启
@@ -195,7 +196,7 @@ let dbFunss = (config) => {
 
     exportsObj.add = async function (tableName, data, connection) {
         // 添加数据, 不能包含 id 字段
-        if (data.id) {
+        if (data.id && !data.notDeleteIdProperty) {
             Reflect.deleteProperty(data, 'id');
         }
         data = dbUtil.convert2DbFieldName(tableName, data);
@@ -233,6 +234,19 @@ let dbFunss = (config) => {
         sql += ' where id in (?)';
         params.push(ids);
         await db.query(sql, params, connection);
+        return 'ok';
+    };
+
+    exportsObj.batchUpdateByIds = async function (tableName, data, ids, options = {}, connection) {
+        if (!ids || !ids.length) {
+            return await Promise.resolve('ok');
+        }
+        let {batchSize = 20} = options;
+        let offset = 0;
+        while (offset < ids.length) {
+            await exportsObj.updateByIds(tableName, data, ids.slice(offset, offset + batchSize), connection);
+            offset += batchSize;
+        }
         return 'ok';
     };
 

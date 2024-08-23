@@ -8,11 +8,11 @@ let db2ramFieldMap = require('./config/db2ramFieldMap.json');
 let textDbFieldsMap = require('./config/textDbFields.json');
 let dbConfig = {
     "connectionLimit": 10,
-    "database": "dev_netease",
-    "host": "dev.youdata.com",
-    "user": "sup_bigviz",
+    "database": "test",
+    "host": "127.0.0.1",
+    "user": "*****",
     "port": 3360,
-    "password": "Sdc2MslOsxw",
+    "password": "******",
     "multipleStatements": true
 };
 
@@ -167,11 +167,11 @@ describe('sampleDao', function(){
                 }
             }).then(res => {
                 expect(res.count).to.be.a('number');
-                expect(res.list).to.be.an('undefined');
+                expect(res.list).to.be.an('null');
             })
         });
 
-        it('分页查询返回 only count', function (){
+        it('分页查询返回 only list', function (){
             return sampleDao.pageQuery({
                 initSql: 'select project_id as projectId, name from sample where id = ?',
                 initParams: [1],
@@ -183,7 +183,7 @@ describe('sampleDao', function(){
                     name: 'xx'
                 }
             }).then(res => {
-                expect(res.count).to.be.an('undefined');
+                expect(res.count).to.be.an('null');
                 expect(res.list).to.be.an('array');
             })
         });
