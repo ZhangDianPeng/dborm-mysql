@@ -315,6 +315,30 @@ describe('sampleDao', function(){
                 res.should.to.be.instanceOf(Array);
             })
         });
+
+        it('strict 模式1', function (){
+            return sampleDao.getList({strict: true, projectId: null}).catch(err =>{
+                err.code.should.to.equal(734);
+            })
+        });
+
+        it('strict 模式2', function (){
+            return sampleDao.getList({strict: true}).then(res =>{
+                res.should.to.be.instanceOf(Array);
+            })
+        });
+
+        it('strict 模式3', function (){
+            return sampleDao.getList({strict: true, projectId: 1}).then(res =>{
+                res.should.to.be.instanceOf(Array);
+            })
+        });
+
+        it('strict 模式4', function (){
+            return sampleDao.getList({strict: true, xxx: 1}).catch(err =>{
+                err.code.should.to.equal(734);
+            })
+        });
     });
 
     //findOne接口
