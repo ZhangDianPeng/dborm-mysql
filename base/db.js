@@ -56,7 +56,7 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
     };
 
     db.wrapTransaction = function (fn, nth, timeout, options = {}) {
-        const Message = '等待事务超时';
+        const Message = options && options.errorMessage || '等待事务超时';
         return function () {
             let ctx = this;
             let params = Array.from(arguments);
