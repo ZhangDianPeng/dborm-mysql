@@ -2,7 +2,7 @@
  * Created by hzzhangdianpeng on 2016/12/2.
  */
 
-let mysql = require('mysql');
+let mysql = require('mysql2');
 const co = require('co');
 let shortUuid = require('short-uuid');
 let moment = require('moment');

@@ -25,7 +25,7 @@
 /*~ This declaration specifies that the function
  *~ is the exported object from the file
  */
-import mysql = require('mysql');
+import mysql = require('mysql2');
 
 export = dbORM;
 
