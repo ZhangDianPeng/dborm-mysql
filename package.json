@@ -1,6 +1,6 @@
 {
   "name": "dborm-mysql",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "a NodeJs ORM for mysql",
   "main": "index.js",
   "types": "index.d.ts",
@@ -9,7 +9,7 @@
     "co": "^4.6.0",
     "lodash": "^4.17.4",
     "moment": "^2.24.0",
-    "mysql": "^2.14.1",
+    "mysql2": "3.16.1",
     "short-uuid": "^2.2.0",
     "util": "^0.10.3"
   },
