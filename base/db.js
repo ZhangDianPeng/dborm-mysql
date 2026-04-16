@@ -40,11 +40,12 @@ module.exports = (dbConfig, {log, noConvertDbCodes, dbCode, logExecuteTime, logg
         return new Promise(function (resolve, reject) {
             db.pool.getConnection(function (err, connection) {
                 if (err) {
-                    if(err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_SEQUENCE_TIMEOUT'){
+                    if(err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'ECONNRESET' || err.code === 'PROTOCOL_SEQUENCE_TIMEOUT'){
                         logger('mysql reconnect， reconnect time:', reconnectionTime++);
                         db.getConnection().then(resolve, reject);
+                    } else {
+                        reject(err);   
                     }
-                    reject(err);
                 } else {
                     connection.connectionLogId = options.transId || shortUuid().new().slice(0, 6);
                     reconnectionTime = 0;
