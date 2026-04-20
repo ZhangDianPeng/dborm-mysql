@@ -8,6 +8,8 @@ let shortUuid = require('short-uuid');
 let moment = require('moment');
 
 function initMysqlPool(db, dbConfig) {
+    dbConfig.enableKeepAlive = true;
+    dbConfig.keepAliveInitialDelay = 10000; // Keep-Alive 探针间隔默认10s
     db.pool = mysql.createPool(dbConfig);
 }
 
